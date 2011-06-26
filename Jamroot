@@ -1,0 +1,126 @@
+project profuse
+    : requirements <library>/HMMoC-BFloat-Algebra//libHMMoC-BFloat-Algebra
+    : requirements <warnings>off ;
+
+use-project /HMMoC-BFloat-Algebra : ./HMMoC-BFloat-Algebra ;
+
+
+
+exe align_AA_CQA
+    : [ obj Align_obj : Align.cpp 
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS <define>ALLOW_BOLTZMANN_GIBBS ] boost_serialization boost_system : ;
+
+exe align_AA_CBW
+    : [ obj Align_obj : Align.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system : ;
+
+exe align_DNA_CQA
+    : [ obj Align_obj : Align.cpp 
+        : <include>./prolific <include>./boost-include <include>./seqan <define>ALLOW_BOLTZMANN_GIBBS ] boost_serialization boost_system : ;
+
+exe align_DNA_CBW
+    : [ obj Align_obj : Align.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system : ;
+
+alias align : align_AA_CQA align_AA_CBW align_DNA_CQA align_DNA_CBW ;
+
+
+exe score_AA_CQA
+    : [ obj Score_obj : Score.cpp 
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS <define>ALLOW_BOLTZMANN_GIBBS ] boost_serialization boost_system : ;
+
+exe score_AA_CBW
+    : [ obj Score_obj : Score.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system : ;
+
+exe score_DNA_CQA
+    : [ obj Score_obj : Score.cpp 
+        : <include>./prolific <include>./boost-include <include>./seqan <define>ALLOW_BOLTZMANN_GIBBS ] boost_serialization boost_system : ;
+
+exe score_DNA_CBW
+    : [ obj Score_obj : Score.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system : ;
+
+alias score : score_AA_CQA score_AA_CBW score_DNA_CQA score_DNA_CBW ;
+
+
+exe drawSequences_AA
+    : [ obj DrawSequences_obj : DrawSequences.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization : ;
+
+exe drawSequences_DNA
+    : [ obj DrawSequences_obj : DrawSequences.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization : ;
+
+alias drawSequences : drawSequences_AA drawSequences_DNA ;
+
+
+exe createRandomSequence_DNA
+    : [ obj CreateRandomSequence_obj : CreateRandomSequence.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization : ;
+
+alias createRandomSequence : createRandomSequence_DNA ;
+
+
+alias progs : align score drawSequences createRandomSequence ;
+
+
+
+exe sequenceToProfile_AA
+    : [ obj SequenceToProfile_obj : SequenceToProfile.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system : ;
+
+exe sequenceToProfile_DNA
+    : [ obj SequenceToProfile_obj : SequenceToProfile.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system : ;
+
+alias sequenceToProfile : sequenceToProfile_AA sequenceToProfile_DNA ;
+
+
+exe profileToSequence_AA
+    : [ obj ProfileToConsensus_obj : ProfileToConsensus.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization : ;
+
+exe profileToSequence_DNA
+    : [ obj ProfileToConsensus_obj : ProfileToConsensus.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization : ;
+
+alias profileToSequence : profileToSequence_AA profileToSequence_DNA ;
+
+
+exe profileTreeToProfile_AA
+    : [ obj ProfileTreeToProfile_obj : ProfileTreeToProfile.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_filesystem : ;
+
+exe profileTreeToProfile_DNA
+    : [ obj ProfileTreeToProfile_obj : ProfileTreeToProfile.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system boost_filesystem : ;
+
+alias profileTreeToProfile : profileTreeToProfile_AA profileTreeToProfile_DNA ;
+
+
+exe alignedFastaToProfile_AA
+    : [ obj AlignedFastaToProfile_obj : AlignedFastaToProfile.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system : ;
+
+exe alignedFastaToProfile_DNA
+    : [ obj AlignedFastaToProfile_obj : AlignedFastaToProfile.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system : ;
+
+alias alignedFastaToProfile : alignedFastaToProfile_AA alignedFastaToProfile_DNA ;
+
+
+alias converters : sequenceToProfile profileToSequence profileTreeToProfile alignedFastaToProfile ;
+
+
+install dist : progs converters : <location>dist ;
+
+alias install : dist ;
+
+
+
+lib boost_serialization : : <file>./boost-lib/libboost_serialization.a ;
+lib boost_filesystem : : <file>./boost-lib/libboost_filesystem.a ;
+lib boost_system : : <file>./boost-lib/libboost_system.a ;
+
+
