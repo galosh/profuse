@@ -113,6 +113,15 @@ alias alignedFastaToProfile : alignedFastaToProfile_AA alignedFastaToProfile_DNA
 alias converters : sequenceToProfile profileToSequence profileTreeToProfile alignedFastaToProfile ;
 
 
+exe profileToHMMer_DNA
+    : [ obj ProfileToHMMer_obj : ProfileToHMMer.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan <include>./hmmer/src <include>./hmmer/squid ] boost_serialization boost_system hmmer squid : ;
+
+alias profileToHMMer : profileToHMMer_DNA ;
+
+explicit profileToHMMer profileToHMMer_DNA ;
+
+
 install dist : progs converters : <location>dist ;
 
 alias install : dist ;
@@ -123,4 +132,5 @@ lib boost_serialization : : <file>./boost-lib/libboost_serialization.a ;
 lib boost_filesystem : : <file>./boost-lib/libboost_filesystem.a ;
 lib boost_system : : <file>./boost-lib/libboost_system.a ;
 
-
+lib hmmer : : <file>hmmer/src/libhmmer.a ;
+lib squid : : <file>hmmer/squid/libsquid.a ;
