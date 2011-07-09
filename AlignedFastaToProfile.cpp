@@ -37,7 +37,7 @@
 #include "Algebra.hpp"
 #include "Profile.hpp"
 #include "Fasta.hpp"
-#include "ProfuseParameters.hpp" // for the parameters
+#include "ProlificParameters.hpp" // for the parameters
 
 #include <iostream>
 
@@ -63,7 +63,7 @@ template <class ResidueType,
           class ProfileType>
 void
 setTransitionsFromParameters (
-  typename ProfuseParameters<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters const & parameters,
+  typename ProlificParameters<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters const & parameters,
   ProfileType & profile
 )
 {
@@ -164,7 +164,7 @@ setTransitionsFromParameters (
     ( 1.0 ) -
     profile[ Transition::fromPostAlign ][ TransitionFromPostAlign::toPostAlign ];
 
-} // setTransitionsFromParameters( ProfuseParameters::Parameters const &, ProfileType & profile )
+} // setTransitionsFromParameters( ProlificParameters::Parameters const &, ProfileType & profile )
 
 
 
@@ -216,7 +216,7 @@ template <class ResidueType,
           class ProfileType>
 void
 gappedFastaAndConsensusToProfile (
-  typename ProfuseParameters<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters const & parameters,
+  typename ProlificParameters<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters const & parameters,
   galosh::Fasta<char> const & gapped_fasta,
   seqan::String<char> const & gapped_consensus,
  ProfileType & profile
@@ -275,7 +275,7 @@ gappedFastaAndConsensusToProfile (
 
   // That's it.
   return;
-} // gappedFastaAndConsensusToProfile( ProfuseParameters::Parameters const &, Fasta<char> const &, String<char> const &, ProfileType & )
+} // gappedFastaAndConsensusToProfile( ProlificParameters::Parameters const &, Fasta<char> const &, String<char> const &, ProfileType & )
 
 } // End namespace galosh
 
@@ -326,7 +326,7 @@ main ( int const argc, char const ** argv )
 
   // The parameters
   // TODO: Let user choose some from command line.
-  galosh::ProfuseParameters<ResidueType, floatrealspace, floatrealspace, floatrealspace>::Parameters parameters;
+  galosh::ProlificParameters<ResidueType, floatrealspace, floatrealspace, floatrealspace>::Parameters parameters;
 
   // Create ungapped consensus
   seqan::String<char> gapped_consensus( *( dynamic_cast<const seqan::String<char> * const>( & gapped_consensus_fasta[ 0 ] ) ) );

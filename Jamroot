@@ -103,13 +103,11 @@ exe profileToHMMer_DNA
 
 alias profileToHMMer : profileToHMMer_DNA ;
 
-explicit profileToHMMer profileToHMMer_DNA ;
-
-
 install dist : progs converters : <location>dist ;
 
 alias install : dist ;
 
+explicit profileToHMMer profileToHMMer_DNA install dist;
 
 
 lib boost_serialization : : <file>./boost-lib/libboost_serialization.a ;

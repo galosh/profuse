@@ -14,7 +14,7 @@
 ##      at the same position, and all remaining mass evenly divided among the
 ##      remaining residues.  The transition parameters are set to the same
 ##      defaults as are used in other profuse programs (see
-##      ProfuseParameters.hpp).
+##      ProlificParameters.hpp).
 ##
 #******************************************************************************
 #*
@@ -44,7 +44,7 @@
 #include "Algebra.hpp"
 #include "Profile.hpp"
 #include "Fasta.hpp"
-#include "ProfuseParameters.hpp" // for the parameters
+#include "ProlificParameters.hpp" // for the parameters
 
 #include <iostream>
 
@@ -69,7 +69,7 @@ template <class ResidueType,
           class ProfileType>
 void
 setTransitionsFromParameters (
-  typename ProfuseParameters<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters const & parameters,
+  typename ProlificParameters<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters const & parameters,
   ProfileType & profile
 )
 {
@@ -170,7 +170,7 @@ setTransitionsFromParameters (
     ( 1.0 ) -
     profile[ Transition::fromPostAlign ][ TransitionFromPostAlign::toPostAlign ];
 
-} // setTransitionsFromParameters( ProfuseParameters::Parameters const &, ProfileType & profile )
+} // setTransitionsFromParameters( ProlificParameters::Parameters const &, ProfileType & profile )
 
 
 /////////////
@@ -184,7 +184,7 @@ template <class ResidueType,
           class ProfileType>
 void
 consensusToProfile (
-  typename ProfuseParameters<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters const & parameters,
+  typename ProlificParameters<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters const & parameters,
   Sequence<SequenceResidueType> const & sequence,
   ProfileType & profile,
   double const & conservation_rate
@@ -236,7 +236,7 @@ consensusToProfile (
 
   // That's it.
   return;
-} // consensusToProfile( ProfuseParameters::Parameters const &, Sequence const &, ProfileType &, double const & )
+} // consensusToProfile( ProlificParameters::Parameters const &, Sequence const &, ProfileType &, double const & )
 
 } // End namespace galosh
 
@@ -270,7 +270,7 @@ main ( int const argc, char const ** argv )
 
   // The parameters
   // TODO: Let user choose some from command line.
-  galosh::ProfuseParameters<seqan::Dna, floatrealspace, floatrealspace, floatrealspace>::Parameters parameters;
+  galosh::ProlificParameters<seqan::Dna, floatrealspace, floatrealspace, floatrealspace>::Parameters parameters;
 
   // arg 3 is the conservation rate (default .75)
   double conservation_rate = .75; // TODO: DEHACKIFY MAGIC # DEFAULT conservation_rate !!
