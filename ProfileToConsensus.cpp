@@ -14,7 +14,7 @@
 #*    This file is part of profuse, a suite of programs for working with
 #*    Profile HMMs.  Please see the document CITING, which should have been
 #*    included with this file.  You may use at will, subject to the license
-#*    (LGPL v3), but *please cite the relevant papers* in your documentation
+#*    (Apache v2.0), but *please cite the relevant papers* in your documentation
 #*    and publications associated with uses of this library.  Thank you!
 #*
 #*    Copyright (C) 2008, 2011 by Paul T. Edlefsen, Fred Hutchinson Cancer
