@@ -6,42 +6,26 @@ use-project /HMMoC-BFloat-Algebra : ./HMMoC-BFloat-Algebra ;
 
 
 
-exe align_AA_CQA
-    : [ obj Align_obj : Align.cpp 
-        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS <define>ALLOW_BOLTZMANN_GIBBS ] boost_serialization boost_system : ;
-
-exe align_AA_CBW
+exe align_AA
     : [ obj Align_obj : Align.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system : ;
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph : ;
 
-exe align_DNA_CQA
-    : [ obj Align_obj : Align.cpp 
-        : <include>./prolific <include>./boost-include <include>./seqan <define>ALLOW_BOLTZMANN_GIBBS ] boost_serialization boost_system : ;
-
-exe align_DNA_CBW
+exe align_DNA
     : [ obj Align_obj : Align.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system : ;
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system boost_graph : ;
 
-alias align : align_AA_CQA align_AA_CBW align_DNA_CQA align_DNA_CBW ;
+alias align : align_AA align_DNA ;
 
 
-exe score_AA_CQA
-    : [ obj Score_obj : Score.cpp 
-        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS <define>ALLOW_BOLTZMANN_GIBBS ] boost_serialization boost_system : ;
-
-exe score_AA_CBW
+exe score_AA
     : [ obj Score_obj : Score.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system : ;
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph : ;
 
-exe score_DNA_CQA
-    : [ obj Score_obj : Score.cpp 
-        : <include>./prolific <include>./boost-include <include>./seqan <define>ALLOW_BOLTZMANN_GIBBS ] boost_serialization boost_system : ;
-
-exe score_DNA_CBW
+exe score_DNA
     : [ obj Score_obj : Score.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system : ;
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system boost_graph : ;
 
-alias score : score_AA_CQA score_AA_CBW score_DNA_CQA score_DNA_CBW ;
+alias score : score_AA score_DNA ;
 
 
 exe drawSequences_AA
@@ -68,11 +52,11 @@ alias progs : align score drawSequences createRandomSequence ;
 
 exe sequenceToProfile_AA
     : [ obj SequenceToProfile_obj : SequenceToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system : ;
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph : ;
 
 exe sequenceToProfile_DNA
     : [ obj SequenceToProfile_obj : SequenceToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system : ;
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system boost_graph : ;
 
 alias sequenceToProfile : sequenceToProfile_AA sequenceToProfile_DNA ;
 
@@ -90,22 +74,22 @@ alias profileToSequence : profileToSequence_AA profileToSequence_DNA ;
 
 exe profileTreeToProfile_AA
     : [ obj ProfileTreeToProfile_obj : ProfileTreeToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_filesystem : ;
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_filesystem : ;
 
 exe profileTreeToProfile_DNA
     : [ obj ProfileTreeToProfile_obj : ProfileTreeToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system boost_filesystem : ;
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system boost_graph boost_filesystem : ;
 
 alias profileTreeToProfile : profileTreeToProfile_AA profileTreeToProfile_DNA ;
 
 
 exe alignedFastaToProfile_AA
     : [ obj AlignedFastaToProfile_obj : AlignedFastaToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system : ;
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph : ;
 
 exe alignedFastaToProfile_DNA
     : [ obj AlignedFastaToProfile_obj : AlignedFastaToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system : ;
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system boost_graph : ;
 
 alias alignedFastaToProfile : alignedFastaToProfile_AA alignedFastaToProfile_DNA ;
 
@@ -130,6 +114,7 @@ alias install : dist ;
 
 lib boost_serialization : : <file>./boost-lib/libboost_serialization.a ;
 lib boost_filesystem : : <file>./boost-lib/libboost_filesystem.a ;
+lib boost_graph : : <file>./boost-lib/libboost_graph.a ;
 lib boost_system : : <file>./boost-lib/libboost_system.a ;
 
 lib hmmer : : <file>hmmer/src/libhmmer.a ;
