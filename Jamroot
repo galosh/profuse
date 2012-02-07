@@ -5,6 +5,16 @@ project profuse
 use-project /HMMoC-BFloat-Algebra : ./HMMoC-BFloat-Algebra ;
 
 
+exe profileToAlignmentProfile_AA
+    : [ obj profileToAlignmentProfile_AA_obj : profileToAlignmentProfile.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
+
+exe profileToAlignmentProfile_DNA
+    : [ obj profileToAlignmentProfile_DNA_obj : profileToAlignmentProfile.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan ] boost_serialization boost_system boost_graph boost_program_options : ;
+
+
+alias profileToAlignmentProfile : profileToAlignmentProfile_AA profileToAlignmentProfile_DNA ;
 
 exe align_AA
     : [ obj Align_obj : Align.cpp
@@ -47,7 +57,6 @@ alias createRandomSequence : createRandomSequence_DNA ;
 
 
 alias progs : align score drawSequences createRandomSequence ;
-
 
 
 exe sequenceToProfile_AA
@@ -94,7 +103,7 @@ exe alignedFastaToProfile_DNA
 alias alignedFastaToProfile : alignedFastaToProfile_AA alignedFastaToProfile_DNA ;
 
 
-alias converters : sequenceToProfile profileToSequence profileTreeToProfile alignedFastaToProfile ;
+alias converters : sequenceToProfile profileToSequence profileTreeToProfile alignedFastaToProfile profileToAlignmentProfile ;
 
 
 exe profileToHMMer_DNA
@@ -114,6 +123,6 @@ lib boost_serialization : : <file>./boost-lib/libboost_serialization.a ;
 lib boost_filesystem : : <file>./boost-lib/libboost_filesystem.a ;
 lib boost_graph : : <file>./boost-lib/libboost_graph.a ;
 lib boost_system : : <file>./boost-lib/libboost_system.a ;
-
 lib hmmer : : <file>hmmer/src/libhmmer.a ;
 lib squid : : <file>hmmer/squid/libsquid.a ;
+lib boost_program_options : : <file>./boost-lib/libboost_program_options.a ;

@@ -5,6 +5,8 @@
 ## -pg is for use with gprof.  Use on CFLAGS and on LDFLAGS
 #CFLAGS		= -Wall -pg
 #CFLAGS         = -Winline
+# TAH 2/12 for debugging within Eclipse
+CFLAGS		= -g3 -gdwarf-2  
 #JFLAGS		=
 #LDFLAGS	= -pg
 
@@ -35,7 +37,8 @@ PROLIFIC_LIBS		=
 ## For Boost support (required):
 BOOST_CFLAGS 	= -I./boost-include
 BOOST_LDFLAGS 	= -L./boost-lib
-BOOST_LIBS	= -lboost_serialization -lboost_graph -lboost_filesystem -lboost_system
+# TAH 2/12 added program options
+BOOST_LIBS	= -lboost_serialization -lboost_graph -lboost_filesystem -lboost_system -lboost_program_options
 
 #========================================
 ### Paul added these for HMMer (and squid) support (optional)
@@ -47,11 +50,23 @@ HMMER_LIBS	= -lsquid -lhmmer
 #HMMER_LIBS	=
 
 ###==============================================
+#
+# This section modified by TAH 2/12.  Note that we assume that the
+# prolific library is below the current (profuse) directory.
+#
 
-INCS = Profuse.hpp
+# In case any of these hpp files change, rebuild programs
+PROLIFIC_LIB = ./prolific
+INCS = Profuse.hpp \
+       $(PROLIFIC_LIB)/DynamicProgramming.hpp \
+       $(PROLIFIC_LIB)/MultinomialDistribution.hpp \
+       $(PROLIFIC_LIB)/Profile.hpp
 
 ALIGN_INCS = $(INCS) \
 ScoreAndMaybeAlign.hpp
+
+PROF2ALPROF_INCS = $(INCS) \
+GenAlignmentProfiles.hpp
 
 SCORE_INCS = $(INCS) \
 ScoreAndMaybeAlign.hpp
@@ -69,6 +84,9 @@ ALIGNEDFASTATOPROFILE_INCS = $(INCS)
 PROFILETREETOPROFILE_INCS = $(INCS)
 
 PROFILETOHMMER_INCS = $(INCS)
+
+PROF2ALPROF_INCS = $(INCS) \
+GenAlignmentProfiles.hpp
 
 ALIGN_OBJS = Align.o
 
@@ -88,6 +106,8 @@ PROFILETREETOPROFILE_OBJS = ProfileTreeToProfile.o
 
 PROFILETOHMMER_OBJS = ProfileToHMMer.o
 
+PROF2ALPROF_OBJS = profileToAlignmentProfile.o
+
 ALIGN_SOURCES = Align.cpp
 
 SCORE_SOURCES = Score.cpp
@@ -105,6 +125,8 @@ ALIGNEDFASTATOPROFILE_SOURCES = AlignedFastaToProfile.cpp
 PROFILETREETOPROFILE_SOURCES = ProfileTreeToProfile.cpp
 
 PROFILETOHMMER_SOURCES = ProfileToHMMer.cpp
+
+PROF2ALPROF_SOURCES = profileToAlignmentProfile.cpp
 
 default: all
 
@@ -135,9 +157,12 @@ profileTreeToProfile: $(PROFILETREETOPROFILE_SOURCES) $(PROFILETREETOPROFILE_INC
 profileToHMMer: $(PROFILETOHMMER_SOURCES) $(PROFILETOHMMER_INCS) $(PROFILETOHMMER_OBJS) $(MUSCLE_CPPOBJ)
 	     $(CXX_LINK) $(HMMER_LDFLAGS) $(HMMER_LIBS) -o profileToHMMer $(PROFILETOHMMER_OBJS)
 
-converters: sequenceToProfile alignedFastaToProfile profileTreeToProfile profileToSequence
+profileToAlignmentProfile: $(PROF2ALPROF_SOURCES) $(PROF2ALPROF_INCS) $(PROF2ALPROF_OBJS) $(MUSCLE_CPPOBJ)
+	     $(CXX_LINK) -o profileToAlignmentProfile $(PROF2ALPROF_OBJS) $(MUSCLE_CPPOBJ)
 
-progs: align score createRandomSequence drawSequences
+converters: sequenceToProfile alignedFastaToProfile profileTreeToProfile profileToSequence profileToAlignmentProfile
+
+progs: align score createRandomSequence drawSequences 
 
 all: progs converters
 
@@ -154,7 +179,7 @@ $(SCORE_OBJS): $(SCORE_SOURCES) $(SCORE_INCS)
 
 .PHONY: clean
 clean:
-	rm -f align score createRandomSequence drawSequences profileToSequence sequenceToProfile alignedFastaToProfile profileTreeToProfile profileToHMMer $(ALIGN_OBJS) $(SCORE_OBJS) $(CREATERANDOMSEQUENCE_OBJS) $(DRAWSEQUENCES_OBJS) $(PROFILETOSEQUENCE_OBJS) $(SEQUENCETOPROFILE_OBJS) $(PROFILETREETOPROFILE_OBJS) $(ALIGNEDFASTATOPROFILE_OBJS) $(PROFILETOHMMER_OBJS) 
+	rm -f align score createRandomSequence drawSequences profileToSequence sequenceToProfile alignedFastaToProfile profileTreeToProfile profileToHMMer profileToAlignmentProfile $(ALIGN_OBJS) $(SCORE_OBJS) $(CREATERANDOMSEQUENCE_OBJS) $(DRAWSEQUENCES_OBJS) $(PROFILETOSEQUENCE_OBJS) $(SEQUENCETOPROFILE_OBJS) $(PROFILETREETOPROFILE_OBJS) $(ALIGNEDFASTATOPROFILE_OBJS) $(PROFILETOHMMER_OBJS) $(PROF2ALPROF_OBJS) 
 
 #========================================
 # FILE EXTENSIONS.  Extensions and prefixes for different types of
