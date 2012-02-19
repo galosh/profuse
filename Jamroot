@@ -123,6 +123,6 @@ lib boost_serialization : : <file>./boost-lib/libboost_serialization.a ;
 lib boost_filesystem : : <file>./boost-lib/libboost_filesystem.a ;
 lib boost_graph : : <file>./boost-lib/libboost_graph.a ;
 lib boost_system : : <file>./boost-lib/libboost_system.a ;
-lib hmmer : : <file>hmmer/src/libhmmer.a ;
-lib squid : : <file>hmmer/squid/libsquid.a ;
+#lib hmmer : : <file>hmmer/src/libhmmer.a ;
+#lib squid : : <file>hmmer/squid/libsquid.a ;
 lib boost_program_options : : <file>./boost-lib/libboost_program_options.a ;
