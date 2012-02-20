@@ -92,33 +92,39 @@ public:
    * Alignment Profiles.
    **/
   std::vector<typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile>
-  gen_alignment_profiles (boost::program_options::variables_map vm) const
+  gen_alignment_profiles ( boost::program_options::variables_map vm ) const
   {
-	typedef ProfileTreeRoot<ResidueType, ProbabilityType> ProfileType;
+    typedef ProfileTreeRoot<ResidueType, ProbabilityType> ProfileType;
     /**
      * obtain program parameters from variables_map
      */
-	const std::string profile_filename = vm["profile"].as<string>();
-	const std::string fasta_filename = vm["fasta"].as<string>();
-	int sequence_count = 0;
-	if(vm.count("nfasta")) sequence_count = vm["nfasta"].as<int>();
-	int verbosity = 0;
-	if(vm.count("verbosity")) verbosity = vm["verbosity"].as<int>();
+    const std::string profile_filename = vm["profile"].as<string>();
+    const std::string fasta_filename = vm["fasta"].as<string>();
+    int sequence_count = 0;
+    if( vm.count( "nseq" ) ) {
+      sequence_count = vm["nseq"].as<int>();
+    }
+    int verbosity = 0;
+    if( vm.count( "verbosity" ) ) {
+      verbosity = vm["verbosity"].as<int>();
+    }
     const bool be_verbose = verbosity > 0;
     const bool be_verbose_show_profiles = verbosity > 1;
     const bool be_verbose_show_sequences = verbosity > 2;
-	const bool use_viterbi = vm.count("viterbi") > 0;
-    const bool indiv_profiles = vm.count("individual") > 0;
+    const bool use_viterbi = vm.count( "viterbi" ) > 0;
+    const bool indiv_profiles = vm.count( "individual" ) > 0;
     std::string alignment_format = "fasta";
-    if(vm.count("format")) alignment_format = vm["format"].as<std::string>();
+    if( vm.count( "format" ) ) {
+      alignment_format = vm["format"].as<std::string>();
+    }
 
     ProfileType profile;
     if( be_verbose ) {
       cerr << "Reading profile from file '" << profile_filename << "'" << endl;
     }
-    if(!profile.fromFile( profile_filename ))
+    if( !profile.fromFile( profile_filename ) )
     {
-    	   throw ("Can't open profile file " + profile_filename);
+      throw( "Can't open profile file " + profile_filename );
     }
     if( be_verbose ) {
       if( be_verbose_show_profiles ) {
@@ -135,8 +141,8 @@ public:
       cerr << "Reading sequences from Fasta file '" << fasta_filename << "'" << endl;
     }
     /// \todo Find out why Fasta.fromFile(string) returns void instead of boolean
-    if(!fasta.fromFile( fasta_filename.c_str() )) {
-    	   throw "Can't open fasta file " + fasta_filename;
+    if( !fasta.fromFile( fasta_filename.c_str() ) ) {
+      throw "Can't open fasta file " + fasta_filename;
     }
     if( be_verbose ) {
       if( be_verbose_show_sequences ) {
@@ -151,7 +157,7 @@ public:
     sequence_count = ( ( sequence_count == 0 ) ? fasta.size() : min( static_cast<size_t>( sequence_count ), fasta.size() ) );
 
     if( be_verbose ) {
-      cerr << "Allocating the dp matrices." << endl;
+      cerr << "Allocating the dp matrices for " << sequence_count << " sequences." << endl;
     }
     typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Matrix::SequentialAccessContainer dp_matrices(
       profile,
@@ -166,10 +172,10 @@ public:
     DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType> dp;
     typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters parameters;
 
+    if( be_verbose ) {
+      cerr << "Computing the dp matrices for the multiple alignment." << endl;
+    }
     if( use_viterbi ) {
-      if( be_verbose ) {
-        cerr << "Calculating the viterbi score, and computing the dp matrices for the multiple alignment." << endl;
-      }
       score =
         dp.forward_score_viterbi(
           parameters,
@@ -181,10 +187,34 @@ public:
       if( be_verbose ) {
         cerr << "\tThe total viterbi score for these sequences is: " << score << endl;
       }
-    } else { // if use_viterbi .. else ..
-      if( be_verbose ) {
-        cerr << "Calculating the forward score." << endl;
+
+      if( be_verbose_show_sequences ) {
+        if( be_verbose ) {
+          cerr << "Backtracing to compute the alignments." << endl;
+        }
+        // Show multiple alignment
+        typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::template MultipleAlignment<ProfileType, SequenceResidueType> ma(
+          &profile,
+          &fasta,
+          sequence_count
+        );
+        dp.forward_viterbiAlign(
+          parameters,
+          dp_matrices,
+          ma
+        );
+        if(be_verbose) cerr << "\tdone." << endl;
+        cerr << "\tThe multiple alignment is:" << endl;
+        if( alignment_format == "pairwise" ) {
+          ma.toPairwiseStream( cerr, &fasta.m_descriptions );
+        } else if( alignment_format == "fasta" ) {
+          ma.toAlignedFastaStream( cerr, &fasta.m_descriptions );
+        } else { //if( alignment_format == "pileup" ) {
+          ma.toPileupStream( cerr, &fasta.m_descriptions );
+        }
       }
+
+    } else { // if use_viterbi .. else ..
       score =
         dp.forward_score(
           parameters,
@@ -196,39 +226,19 @@ public:
       if( be_verbose ) {
         cerr << "\tThe total probability of these sequences, given this profile model, is: " << score << endl;
       }
-      //return score; // Can't align unless we make viterbi matrices. ///TAH ? is this true or is it a leftover comment?
+      //return score; // Can't align unless we make viterbi matrices. ///TAH ? is this true or is it a leftover comment? // DOPTE: You can't make traditional/standard alignments without knowing one "best" alignment per sequence, which is something viterbi() does but not forward().
     } // End if use_viterbi .. else ..
-    // End calculating viterbi score and filling the dp matrices
+    // End calculating score and filling the dp matrices
   
-    if( be_verbose ) {
-      cerr << "Backtracing to compute the alignments." << endl;
-    }
-    // Show multiple alignment
-    typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::template MultipleAlignment<ProfileType, SequenceResidueType> ma(
-      &profile,
-      &fasta,
-      sequence_count
-    );
-    dp.forward_viterbiAlign(
-      parameters,
-      dp_matrices,
-      ma
-    );
-    if(be_verbose) cerr << "\tdone." << endl;
-    if( be_verbose_show_sequences ) {
-      cerr << "\tThe multiple alignment is:" << endl;
-      if(alignment_format == "pileup")   ma.toPileupStream( cerr, &fasta.m_descriptions );
-      if(alignment_format == "pairwise") ma.toPairwiseStream( cerr, &fasta.m_descriptions );
-      if(alignment_format == "fasta")    ma.toAlignedFastaStream( cerr, &fasta.m_descriptions );
-    }
     std::vector<typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile> alignment_profiles(sequence_count);
-    for(int i=0;i < alignment_profiles.size(); i++)
+    for( int i = 0; i < alignment_profiles.size(); i++ )
     {
-    	   alignment_profiles[i].reinitialize(profile.length()+1);
+      alignment_profiles[ i ].reinitialize( profile.length() + 1 );
     }
-    if(be_verbose) cerr << "calculating alignment profiles with " << alignment_profiles.size() << " sequences" << endl;
-    dp.calculateAlignmentProfiles
-    (
+    if( be_verbose ) {
+      cerr << "Calculating the alignment profiles." << endl;
+    }
+    dp.calculateAlignmentProfiles(
        parameters,
        profile,
        fasta,
@@ -236,31 +246,46 @@ public:
        dp_matrices,
        alignment_profiles
     );
-    if(be_verbose) cerr << "\tdone." << endl;
-    if(be_verbose) cerr << "Normalizing " << alignment_profiles.size() << " profiles" << endl;
-    for(int i=0;i < alignment_profiles.size(); i++)
-    {
-    	    alignment_profiles[i].normalize(0.0);
+    if( be_verbose ) {
+      cerr << "\tdone." << endl;
     }
-    if(be_verbose) cerr << "\tdone." << endl;
 
-    if(indiv_profiles) return alignment_profiles;
-    typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile averageProfile;
-    averageProfile.reinitialize(profile.length() + 1);
-    averageProfile.zero();
-    if(be_verbose) cerr << "Averaging " << alignment_profiles.size() << " profiles" << endl;
-    for(int i=0;i < alignment_profiles.size(); i++)
-    {
-    	    averageProfile += alignment_profiles[i];
+    /// DOPTE: Normalizing each individual profile isn't quite right, because the expected counts for the multi-use parameters (the internal transition parameters and the insertion emission parameters) can be greater than one and their sums vary by sequence.
+    //if( be_verbose ) {
+    //  cerr << "Normalizing " << alignment_profiles.size() << " alignment profiles" << endl;
+    //}
+    //for( int i = 0; i < alignment_profiles.size(); i++ )
+    //{
+    //  alignment_profiles[ i ].normalize( 0.0 );
+    //}
+    //if( be_verbose ) {
+    //  cerr << "\tdone." << endl;
+    //}
+
+    if( indiv_profiles ) {
+      return alignment_profiles;
     }
-    if(be_verbose) cerr << "\tdone." << endl;
-    averageProfile.normalize(0.0);
+
+    typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile averageProfile;
+    averageProfile.reinitialize( profile.length() + 1 );
+    averageProfile.zero();
+    if( be_verbose ) {
+      cerr << "Averaging " << alignment_profiles.size() << " profiles" << endl;
+    }
+    for( int i = 0; i < alignment_profiles.size(); i++ )
+    {
+      averageProfile += alignment_profiles[ i ];
+    }
+    if( be_verbose ) {
+      cerr << "\tdone." << endl;
+    }
+    averageProfile.normalize( 0.0 );
+
     alignment_profiles.clear();
-    alignment_profiles.push_back(averageProfile);
+    alignment_profiles.push_back( averageProfile );
     return alignment_profiles;
 
-
-  } // gen_alignment_profiles(variables_map vm)
+  } // gen_alignment_profiles( variables_map vm )
 
 }; // End class GenAlignmentProfiles
 
