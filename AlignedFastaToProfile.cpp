@@ -179,8 +179,8 @@ ungapSequence (
   typedef typename seqan::Iterator< seqan::String<SourceElementType > >::Type TSourceIter;
 
   for( TSourceIter it = seqan::begin( source ); it != seqan::end( source ); ++it ) {
-    if( value( it ) != '-' ) {
-      target += value( it );
+    if( seqan::value( it ) != '-' ) {
+      target += seqan::value( it );
     }
   }
 
@@ -250,7 +250,7 @@ gappedFastaAndConsensusToProfile (
   uint32_t col_i = 0; // Pos in gapped_fasta seqs
   uint32_t gaps_in_col_i;
   for( TGappedConsensusIter it = seqan::begin( gapped_consensus ); it != seqan::end( gapped_consensus ); ++it, ++col_i ) {
-    if( value( it ) == '-' ) {
+    if( seqan::value( it ) == '-' ) {
       continue;
     }
     gaps_in_col_i = 0;
