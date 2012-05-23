@@ -59,12 +59,12 @@ char **g_argv;
 using namespace galosh;
 
 /**
- * \fn int main(int const argc, char const ** argv)
+ * \fn int main(int const argc, char ** argv)
  * \brief main driver.  Parses command line and calls gen_alignment_profiles
  * prints alignment profile output.
  */
 int
-main ( int const argc, char const ** argv )
+main ( int const argc, char ** argv )
 {
   typedef doublerealspace ProbabilityType;
   typedef bfloat ScoreType;
