@@ -36,13 +36,12 @@
  *
  * profileToAlignmentProfile options:
  *
- *  -h [ --help ]                output this help message
- * --verbosity arg (=0)         set verbosity level (0 - 3)
- * -i [ --individual ]          output individual alignment profiles instead of
- *                              average
- * -f [ --format ] arg (=fasta) output format of alignments (verbosity>=2)
- * -n [ --nseq ] arg            number of sequences to use (default is ALL)
- * -v [ --viterbi ]             use viterbi algorithm
+ * -h [ --help ]                 output this help message
+ * --verbosity arg (=0)          set verbosity level (0 - 3)
+ * -i [ --individual ]           output individual alignment profiles instead of
+ *                               combined
+ * -n [ --nseq ] arg             number of sequences to use (default is ALL)
+ * -v [ --viterbi ]              use viterbi algorithm
  * </pre>
  *
  */
@@ -57,29 +56,18 @@ char **g_argv;
 #endif // __HAVE_MUSCLE
 
 using namespace galosh;
+
 /**
- * \fn int main(int const argc, char const ** argv)
+ * \fn int main(int const argc, char ** argv)
  * \brief main driver.  Parses command line and calls gen_alignment_profiles
  * prints alignment profile output.
  */
 int
-main ( int const argc, char const ** argv )
+main ( int const argc, char ** argv )
 {
-  //typedef bfloat ProbabilityType;
-  //typedef logspace ProbabilityType;
-  //typedef floatrealspace ProbabilityType;
   typedef doublerealspace ProbabilityType;
-  
-  typedef bfloat ScoreType; // Preferred
-  //typedef logspace ScoreType; // SLOWer than bfloat
-  //typedef realspace ScoreType; // Only for very few & small sequences
-  
-  // if using anything other than LogProbability for the MatrixValueType,
-  // params.useRabinerScaling should be set to true.
+  typedef bfloat ScoreType;
   typedef bfloat MatrixValueType;
-  //typedef logspace MatrixValueType;
-  //typedef doublerealspace MatrixValueType;
-  //typedef floatrealspace MatrixValueType;
 
 #ifdef __PROFUSE_USE_AMINOS
   typedef seqan::AminoAcid20 ResidueType;
@@ -116,50 +104,52 @@ main ( int const argc, char const ** argv )
   po::variables_map vm;
   try
   {
-     store(po::command_line_parser(argc,argv).options(desc).positional(pdesc).run(),vm);
-     po::store(po::parse_command_line(argc, argv, desc), vm);
-     po::notify(vm);
+    store(po::command_line_parser(argc,argv).options(desc).positional(pdesc).run(),vm);
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+     
+    /// if --help or -h was specified, give help and normal exit
+    if( vm.count("help") )
+    {
+      cout << "Usage: " << USAGE() << endl;
+      cout << desc << endl;
+      return 0;
+    }
 
-     /// if --help or -h was specified, give help and normal exit
-     if (vm.count("help"))
-     {
-        cout << "Usage: " << USAGE() << endl;
-	    cout << desc << endl;
-        return 0;
-     }
-
-     /// If either the profile file or the fasta file wasn't specified
-     /// give short usage message and error exit
-     if(!vm.count("profile") || !vm.count("fasta"))
-     {
-        cerr << "Usage: " << USAGE() << endl;
-        return( 1 );
-     }
-
-     /// Do the work
-     GenAlignmentProfiles<ProbabilityType, ScoreType, MatrixValueType, ResidueType, SequenceResidueType> genAlignProf;
-     std::vector<DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile> alignment_profiles;
-     alignment_profiles = genAlignProf.gen_alignment_profiles(vm);
-
-     /// Output the results
-     /// \todo Make the profile scanner skip "#" lines
-     /// \todo Label lines of individual profiles with something
-     for(int i = 0; i<alignment_profiles.size(); i++)
-     {
-        std::cout << alignment_profiles[i];
-        if(alignment_profiles.size() > 1) std:cout << "#" << std::endl;
-     }
-
-     return 0; // success
-  } catch(std::exception& e) { /// exceptions thrown by boost stuff
-      cerr << "error: " << e.what() << endl;
-      return 1;
-  } catch (string &err) {      /// exceptions thrown by GenAlignmentProfiles, etc.
-	  cerr << "error: " << err << endl;
-	  return 1;
-  } catch(...) {               /// anything else
-      cerr << "Strange unknown exception" << endl;
-      return 1;
+    /// If either the profile file or the fasta file wasn't specified
+    /// give short usage message and error exit
+    if( !vm.count("profile") || !vm.count("fasta") )
+    {
+      cerr << "Usage: " << USAGE() << endl;
+      return( 1 );
+    }
+    
+    /// Do the work
+    GenAlignmentProfiles<ProbabilityType, ScoreType, MatrixValueType, ResidueType, SequenceResidueType> genAlignProf;
+    std::vector<DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile> alignment_profiles;
+    alignment_profiles = genAlignProf.gen_alignment_profiles( vm );
+    
+    /// Output the results
+    /// \todo Make the profile scanner skip "#" lines
+    /// \todo Label lines of individual profiles with something
+    for( int i = 0; i < alignment_profiles.size(); i++ )
+    {
+      std::cout << alignment_profiles[ i ];
+      if( alignment_profiles.size() > 1 ) {
+      std:cout << "#" << std::endl;
+      }
+    }
+    
+    return 0; // success
+  } catch( std::exception& e ) { /// exceptions thrown by boost stuff
+    cerr << "error: " << e.what() << endl;
+    return 1;
+  } catch( string &err ) {      /// exceptions thrown by GenAlignmentProfiles, etc.
+    cerr << "error: " << err << endl;
+    return 1;
+  } catch( ... ) {               /// anything else
+    cerr << "Strange unknown exception" << endl;
+    return 1;
   }
 } // main (..)
 

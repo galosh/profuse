@@ -37,8 +37,8 @@ PROLIFIC_LIBS		=
 ## For Boost support (required):
 BOOST_CFLAGS 	= -I./boost-include
 BOOST_LDFLAGS 	= -L./boost-lib
-# TAH 2/12 added program options
-BOOST_LIBS	= -lboost_serialization -lboost_graph -lboost_filesystem -lboost_system -lboost_program_options
+# TAH 2/12 added program options; 5/12 added regex for Boost 1.49 on linux
+BOOST_LIBS	= -lboost_serialization -lboost_graph -lboost_filesystem -lboost_system -lboost_program_options -lboost_regex
 
 #========================================
 ### Paul added these for HMMer (and squid) support (optional)

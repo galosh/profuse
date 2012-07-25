@@ -195,8 +195,8 @@ public:
     }
     // TODO: Make this a parameter to choose between output formats.
     //ma.toPileupStream( cout, &fasta.m_descriptions );
-    //ma.toPairwiseStream( cout, &fasta.m_descriptions );
-    ma.toAlignedFastaStream( cout, &fasta.m_descriptions );
+    ma.toPairwiseStream( cout, &fasta.m_descriptions );
+    //ma.toAlignedFastaStream( cout, &fasta.m_descriptions );
 
     return score;
   } // score_and_maybe_align ( string const &, string const &, bool const & use_viterbi )
