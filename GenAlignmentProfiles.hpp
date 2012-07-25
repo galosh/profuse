@@ -185,32 +185,6 @@ public:
         cerr << "\tThe total viterbi score for these sequences is: " << score << endl;
       }
 
-      if( be_verbose_show_sequences ) {
-        if( be_verbose ) {
-          cerr << "Backtracing to compute the alignments." << endl;
-        }
-        // Show multiple alignment
-        typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::template MultipleAlignment<ProfileType, SequenceResidueType> ma(
-          &profile,
-          &fasta,
-          sequence_count
-        );
-        dp.forward_viterbiAlign(
-          parameters,
-          dp_matrices,
-          ma
-        );
-        if(be_verbose) cerr << "\tdone." << endl;
-        cerr << "\tThe multiple alignment is:" << endl;
-        if( alignment_format == "pairwise" ) {
-          ma.toPairwiseStream( cerr, &fasta.m_descriptions );
-        } else if( alignment_format == "fasta" ) {
-          ma.toAlignedFastaStream( cerr, &fasta.m_descriptions );
-        } else { //if( alignment_format == "pileup" ) {
-          ma.toPileupStream( cerr, &fasta.m_descriptions );
-        }
-      }
-
     } else { // if use_viterbi .. else ..
       score =
         dp.forward_score(
