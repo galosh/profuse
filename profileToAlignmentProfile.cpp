@@ -41,7 +41,7 @@
  * -i [ --individual ]          output individual alignment profiles instead of
  *                              average
  * -f [ --format ] arg (=fasta) output format of alignments (verbosity>=2)
- * -n [ --nfasta ] arg          number of fasta files to use (default is ALL)
+ * -n [ --nseq ] arg            number of sequences to use (default is ALL)
  * -v [ --viterbi ]             use viterbi algorithm
  * </pre>
  *
@@ -105,8 +105,7 @@ main ( int const argc, char const ** argv )
       ("help,h", "output this help message")
       ("verbosity", po::value<int>()->default_value(0), "set verbosity level (0 - 3)")
       ("individual,i","output individual alignment profiles instead of average")
-      ("format,f",po::value<std::string>()->default_value("fasta"),"output format of alignments (verbosity>=2)")
-      ("nfasta,n",po::value<int>(),"number of fasta files to use (default is ALL)")
+      ("nseq,n",po::value<int>(),"number of sequences to use (default is ALL)")
       ("viterbi,v","use viterbi algorithm")
       ("profile",po::value<string>(),"Name of file containing galosh profile")
       ("fasta",po::value<string>(),"Name of fasta file containing sequences")
