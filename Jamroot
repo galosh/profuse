@@ -81,15 +81,15 @@ exe profileToSequence_DNA
 alias profileToSequence : profileToSequence_AA profileToSequence_DNA ;
 
 
-exe profileTreeToProfile_AA
-    : [ obj ProfileTreeToProfile_obj : ProfileTreeToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options boost_filesystem : ;
-
-exe profileTreeToProfile_DNA
-    : [ obj ProfileTreeToProfile_obj : ProfileTreeToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization boost_system boost_graph boost_program_options boost_filesystem : ;
-
-alias profileTreeToProfile : profileTreeToProfile_AA profileTreeToProfile_DNA ;
+# exe profileTreeToProfile_AA
+#     : [ obj ProfileTreeToProfile_obj : ProfileTreeToProfile.cpp
+#         : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options boost_filesystem : ;
+# 
+# exe profileTreeToProfile_DNA
+#     : [ obj ProfileTreeToProfile_obj : ProfileTreeToProfile.cpp
+#         : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization boost_system boost_graph boost_program_options boost_filesystem : ;
+# 
+# alias profileTreeToProfile : profileTreeToProfile_AA profileTreeToProfile_DNA ;
 
 
 exe alignedFastaToProfile_AA
@@ -103,7 +103,8 @@ exe alignedFastaToProfile_DNA
 alias alignedFastaToProfile : alignedFastaToProfile_AA alignedFastaToProfile_DNA ;
 
 
-alias converters : sequenceToProfile profileToSequence profileTreeToProfile alignedFastaToProfile profileToAlignmentProfile ;
+#alias converters : sequenceToProfile profileToSequence profileTreeToProfile alignedFastaToProfile profileToAlignmentProfile ;
+alias converters : sequenceToProfile profileToSequence alignedFastaToProfile profileToAlignmentProfile ;
 
 
 exe profileToHMMer_DNA

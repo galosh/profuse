@@ -69,43 +69,20 @@ setTransitionsFromParameters (
 {
   uint32_t profile_length = profile.length();
 
-  // Use the first element of the expectedDeletionsCounts parameter vector, if
-  // there is one, or 1.0.
-  double expected_deletions_count =
-    (
-      parameters.expectedDeletionsCounts ?
-      ( *parameters.expectedDeletionsCounts )[ 0 ] :
-      1.0
-    );
-  // If useDeletionsForInsertionsParameters, use the expected_deletions_count;
-  // otherwise, use the first element of the expectedInsertionsCounts parameter
-  // vector, if there is one, or 1.0.
+  double expected_deletions_count = parameters.expectedDeletionsCounts[ 0 ];
   double expected_insertions_count =
     (
       parameters.useDeletionsForInsertionsParameters ?
       expected_deletions_count :
-      (
-        ( parameters.expectedInsertionsCounts ?
-        ( *parameters.expectedInsertionsCounts )[ 0 ] :
-        1.0
-        )
-      )
+      parameters.expectedInsertionsCounts[ 0 ] 
     );
   double expected_deletion_length_as_profile_length_fraction =
-    (
-      parameters.expectedDeletionLengthAsProfileLengthFractions ?
-      ( *parameters.expectedDeletionLengthAsProfileLengthFractions )[ 0 ] :
-      1.0
-    );
+    parameters.expectedDeletionLengthAsProfileLengthFractions[ 0 ];
   double expected_insertion_length_as_profile_length_fraction =
     (
       parameters.useDeletionsForInsertionsParameters ?
       expected_deletion_length_as_profile_length_fraction :
-      (
-        parameters.expectedInsertionLengthAsProfileLengthFractions ?
-        ( *parameters.expectedInsertionLengthAsProfileLengthFractions )[ 0 ] :
-        1.0
-      )
+      parameters.expectedInsertionLengthAsProfileLengthFractions[ 0 ]
     );
 
   ProbabilityType deletion_open =
@@ -176,9 +153,10 @@ ungapSequence (
                seqan::String<TargetElementType> & target
 )
 {
-  typedef typename seqan::Iterator< seqan::String<SourceElementType > >::Type TSourceIter;
-
-  for( TSourceIter it = seqan::begin( source ); it != seqan::end( source ); ++it ) {
+  typedef typename seqan::Iterator< const seqan::String<SourceElementType > >::Type TSourceIter;
+  TSourceIter it = seqan::begin( source );
+  TSourceIter it_end = seqan::end( source );
+  for( ; it != it_end; ++it ) {
     if( seqan::value( it ) != '-' ) {
       target += seqan::value( it );
     }
@@ -243,13 +221,15 @@ gappedFastaAndConsensusToProfile (
   );
   // Note Insertion distribution(s) are even now.  TODO: allow an option to set
   // the Insertion distribution to something else.
-  typedef typename seqan::Iterator< seqan::String<char > >::Type TGappedConsensusIter;
+  typedef typename seqan::Iterator< const seqan::String<char > >::Type TGappedConsensusIter;
   const uint32_t num_seqs = gapped_fasta.size();
 
   uint32_t prof_pos_i = 0; // Pos in profile.
   uint32_t col_i = 0; // Pos in gapped_fasta seqs
   uint32_t gaps_in_col_i;
-  for( TGappedConsensusIter it = seqan::begin( gapped_consensus ); it != seqan::end( gapped_consensus ); ++it, ++col_i ) {
+  TGappedConsensusIter it = seqan::begin( gapped_consensus );
+  TGappedConsensusIter it_end = seqan::end( gapped_consensus );
+  for( ; it != it_end; ++it, ++col_i ) {
     if( seqan::value( it ) == '-' ) {
       continue;
     }

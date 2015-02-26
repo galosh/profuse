@@ -75,43 +75,20 @@ setTransitionsFromParameters (
 {
   uint32_t profile_length = profile.length();
 
-  // Use the first element of the expectedDeletionsCounts parameter vector, if
-  // there is one, or 1.0.
-  double expected_deletions_count =
-    (
-      parameters.expectedDeletionsCounts ?
-      ( *parameters.expectedDeletionsCounts )[ 0 ] :
-      1.0
-    );
-  // If useDeletionsForInsertionsParameters, use the expected_deletions_count;
-  // otherwise, use the first element of the expectedInsertionsCounts parameter
-  // vector, if there is one, or 1.0.
+  double expected_deletions_count = parameters.expectedDeletionsCounts[ 0 ];
   double expected_insertions_count =
     (
       parameters.useDeletionsForInsertionsParameters ?
       expected_deletions_count :
-      (
-        ( parameters.expectedInsertionsCounts ?
-        ( *parameters.expectedInsertionsCounts )[ 0 ] :
-        1.0
-        )
-      )
+      parameters.expectedInsertionsCounts[ 0 ] 
     );
   double expected_deletion_length_as_profile_length_fraction =
-    (
-      parameters.expectedDeletionLengthAsProfileLengthFractions ?
-      ( *parameters.expectedDeletionLengthAsProfileLengthFractions )[ 0 ] :
-      1.0
-    );
+    parameters.expectedDeletionLengthAsProfileLengthFractions[ 0 ];
   double expected_insertion_length_as_profile_length_fraction =
     (
       parameters.useDeletionsForInsertionsParameters ?
       expected_deletion_length_as_profile_length_fraction :
-      (
-        parameters.expectedInsertionLengthAsProfileLengthFractions ?
-        ( *parameters.expectedInsertionLengthAsProfileLengthFractions )[ 0 ] :
-        1.0
-      )
+      parameters.expectedInsertionLengthAsProfileLengthFractions[ 0 ]
     );
 
   ProbabilityType deletion_open =

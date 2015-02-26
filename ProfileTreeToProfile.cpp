@@ -75,7 +75,7 @@ namespace galosh {
       boost::archive::xml_iarchive ia( ifs );
     
       // restore the profile from the archive
-      ia >> BOOST_SERIALIZATION_NVP( profuse_object );
+      ia & BOOST_SERIALIZATION_NVP( profuse_object );
     } // readXML( Serializable &, const char * )
 
 } // End namespace galosh
