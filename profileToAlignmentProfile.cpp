@@ -88,26 +88,28 @@ main ( int const argc, char ** argv )
    */
 #define USAGE() " " << argv[0] << " [options] <profile-file-name> <fasta-file-name>"
   namespace po = boost::program_options;
+  DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters dpp;
+  po::options_description dpod = dpp.m_galosh_options_description;
+  po::variables_map dpvm = dpp.m_galosh_options_map;
   po::options_description desc("profileToAlignmentProfile options");
   desc.add_options()
       ("help,h", "output this help message")
-      ("verbosity", po::value<int>()->default_value(0), "set verbosity level (0 - 3)")
       ("individual,i","output individual alignment profiles instead of average")
       ("nseq,n",po::value<int>(),"number of sequences to use (default is ALL)")
       ("viterbi,v","use viterbi algorithm")
       ("profile",po::value<string>(),"Name of file containing galosh profile")
       ("fasta",po::value<string>(),"Name of fasta file containing sequences")
   ;
+  desc.add(dpod);
   po::positional_options_description pdesc;
   pdesc.add("profile",1);
   pdesc.add("fasta",1);
   po::variables_map vm;
   try
   {
-    store(po::command_line_parser(argc,argv).options(desc).positional(pdesc).run(),vm);
-    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::store(po::command_line_parser(argc,argv).options(desc).positional(pdesc).run(),vm);
+//    po::store(po::parse_command_line(argc, argv, desc), vm);
     po::notify(vm);
-     
     /// if --help or -h was specified, give help and normal exit
     if( vm.count("help") )
     {
@@ -134,10 +136,8 @@ main ( int const argc, char ** argv )
     /// \todo Label lines of individual profiles with something
     for( int i = 0; i < alignment_profiles.size(); i++ )
     {
+      if(alignment_profiles.size() > 1) std:cout << "#" << std::endl;
       std::cout << alignment_profiles[ i ];
-      if( alignment_profiles.size() > 1 ) {
-      std:cout << "#" << std::endl;
-      }
     }
     
     return 0; // success

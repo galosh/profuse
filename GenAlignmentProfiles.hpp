@@ -101,6 +101,7 @@ public:
      */
     const std::string profile_filename = vm["profile"].as<string>();
     const std::string fasta_filename = vm["fasta"].as<string>();
+
     int sequence_count = 0;
     if( vm.count( "nseq" ) ) {
       sequence_count = vm["nseq"].as<int>();
@@ -169,6 +170,11 @@ public:
     DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType> dp;
     typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters parameters;
 
+    parameters.m_galosh_options_map = vm;
+    //parameters.matrixRowScaleFactor = parameters.m_galosh_options_map["matrixRowScaleFactor"].as<double>();
+    parameters.resetToDefaults();
+    if(be_verbose) {
+       cerr << "matrixRowScaleFactor in m_galosh_options_map is " << parameters.m_galosh_options_map["matrixRowScaleFactor"].as<double>() << endl;       } // be_verbose 
     if( be_verbose ) {
       cerr << "Computing the dp matrices for the multiple alignment." << endl;
     }
