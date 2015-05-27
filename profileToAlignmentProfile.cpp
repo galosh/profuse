@@ -136,7 +136,7 @@ main ( int const argc, char ** argv )
     /// \todo Label lines of individual profiles with something
     for( int i = 0; i < alignment_profiles.size(); i++ )
     {
-      if(alignment_profiles.size() > 1) std:cout << "#" << std::endl;
+      if(alignment_profiles.size() > 1) std:cout << "#" << alignment_profiles[i].m_comment << std::endl;
       std::cout << alignment_profiles[ i ];
     }
     
