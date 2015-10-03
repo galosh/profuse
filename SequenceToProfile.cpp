@@ -75,20 +75,33 @@ setTransitionsFromParameters (
 {
   uint32_t profile_length = profile.length();
 
-  double expected_deletions_count = parameters.expectedDeletionsCounts[ 0 ];
+  double expected_deletions_count =
+      ( parameters.expectedDeletionsCounts.size() > 0 ?
+        parameters.expectedDeletionsCounts[ 0 ] :
+        0.5
+      );
   double expected_insertions_count =
     (
       parameters.useDeletionsForInsertionsParameters ?
       expected_deletions_count :
-      parameters.expectedInsertionsCounts[ 0 ] 
+      ( parameters.expectedInsertionsCounts.size() > 0 ?
+        parameters.expectedInsertionsCounts[ 0 ] :
+        0.5
+      )
     );
   double expected_deletion_length_as_profile_length_fraction =
-    parameters.expectedDeletionLengthAsProfileLengthFractions[ 0 ];
+      ( parameters.expectedDeletionLengthAsProfileLengthFractions.size() > 0 ?
+        parameters.expectedDeletionLengthAsProfileLengthFractions[ 0 ] :
+        0.0125
+      );
   double expected_insertion_length_as_profile_length_fraction =
     (
       parameters.useDeletionsForInsertionsParameters ?
       expected_deletion_length_as_profile_length_fraction :
-      parameters.expectedInsertionLengthAsProfileLengthFractions[ 0 ]
+      ( parameters.expectedInsertionLengthAsProfileLengthFractions.size() > 0 ?
+        parameters.expectedInsertionLengthAsProfileLengthFractions[ 0 ] :
+        0.0125
+      )
     );
 
   ProbabilityType deletion_open =

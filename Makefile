@@ -17,7 +17,7 @@ CFLAGS		= -g3 -gdwarf-2
 
 #========================================
 ### For Seqan support (required):
-SEQAN_CFLAGS 	= -I./seqan
+SEQAN_CFLAGS 	= -I./seqan-trunk/core/include
 SEQAN_LDFLAGS 	=
 SEQAN_LIBS	=
 

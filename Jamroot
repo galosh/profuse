@@ -4,7 +4,6 @@ project profuse
 
 use-project /HMMoC-BFloat-Algebra : ./HMMoC-BFloat-Algebra ;
 
-
 exe profileToAlignmentProfile_AA
     : [ obj profileToAlignmentProfile_AA_obj : profileToAlignmentProfile.cpp
         : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
