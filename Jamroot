@@ -6,51 +6,51 @@ use-project /HMMoC-BFloat-Algebra : ./HMMoC-BFloat-Algebra ;
 
 exe profileToAlignmentProfile_AA
     : [ obj profileToAlignmentProfile_AA_obj : profileToAlignmentProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
 
 exe profileToAlignmentProfile_DNA
     : [ obj profileToAlignmentProfile_DNA_obj : profileToAlignmentProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization boost_system boost_graph boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include ] boost_serialization boost_system boost_graph boost_program_options : ;
 
 
 alias profileToAlignmentProfile : profileToAlignmentProfile_AA profileToAlignmentProfile_DNA ;
 
 exe align_AA
     : [ obj Align_obj : Align.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
 
 exe align_DNA
     : [ obj Align_obj : Align.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization boost_system boost_graph boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include ] boost_serialization boost_system boost_graph boost_program_options : ;
 
 alias align : align_AA align_DNA ;
 
 
 exe score_AA
     : [ obj Score_obj : Score.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
 
 exe score_DNA
     : [ obj Score_obj : Score.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization boost_system boost_graph boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include ] boost_serialization boost_system boost_graph boost_program_options : ;
 
 alias score : score_AA score_DNA ;
 
 
 exe drawSequences_AA
     : [ obj DrawSequences_obj : DrawSequences.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_program_options : ;
 
 exe drawSequences_DNA
     : [ obj DrawSequences_obj : DrawSequences.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include ] boost_serialization boost_program_options : ;
 
 alias drawSequences : drawSequences_AA drawSequences_DNA ;
 
 
 exe createRandomSequence_DNA
     : [ obj CreateRandomSequence_obj : CreateRandomSequence.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include ] boost_serialization boost_program_options : ;
 
 alias createRandomSequence : createRandomSequence_DNA ;
 
@@ -60,44 +60,44 @@ alias progs : align score drawSequences createRandomSequence ;
 
 exe sequenceToProfile_AA
     : [ obj SequenceToProfile_obj : SequenceToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
 
 exe sequenceToProfile_DNA
     : [ obj SequenceToProfile_obj : SequenceToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization boost_system boost_graph boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include ] boost_serialization boost_system boost_graph boost_program_options : ;
 
 alias sequenceToProfile : sequenceToProfile_AA sequenceToProfile_DNA ;
 
 
 exe profileToSequence_AA
     : [ obj ProfileToConsensus_obj : ProfileToConsensus.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include <define>__PROFUSE_USE_AMINOS ] boost_serialization : ;
 
 exe profileToSequence_DNA
     : [ obj ProfileToConsensus_obj : ProfileToConsensus.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include ] boost_serialization : ;
 
 alias profileToSequence : profileToSequence_AA profileToSequence_DNA ;
 
 
 # exe profileTreeToProfile_AA
 #     : [ obj ProfileTreeToProfile_obj : ProfileTreeToProfile.cpp
-#         : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options boost_filesystem : ;
+#         : <include>./prolific <include>./boost-include <include>./seqan-trunk/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options boost_filesystem : ;
 # 
 # exe profileTreeToProfile_DNA
 #     : [ obj ProfileTreeToProfile_obj : ProfileTreeToProfile.cpp
-#         : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization boost_system boost_graph boost_program_options boost_filesystem : ;
+#         : <include>./prolific <include>./boost-include <include>./seqan-trunk/include ] boost_serialization boost_system boost_graph boost_program_options boost_filesystem : ;
 # 
 # alias profileTreeToProfile : profileTreeToProfile_AA profileTreeToProfile_DNA ;
 
 
 exe alignedFastaToProfile_AA
     : [ obj AlignedFastaToProfile_obj : AlignedFastaToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include <define>__PROFUSE_USE_AMINOS ] boost_serialization boost_system boost_graph boost_program_options : ;
 
 exe alignedFastaToProfile_DNA
     : [ obj AlignedFastaToProfile_obj : AlignedFastaToProfile.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include ] boost_serialization boost_system boost_graph boost_program_options : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include ] boost_serialization boost_system boost_graph boost_program_options : ;
 
 alias alignedFastaToProfile : alignedFastaToProfile_AA alignedFastaToProfile_DNA ;
 
@@ -108,7 +108,7 @@ alias converters : sequenceToProfile profileToSequence alignedFastaToProfile pro
 
 exe profileToHMMer_DNA
     : [ obj ProfileToHMMer_obj : ProfileToHMMer.cpp
-        : <include>./prolific <include>./boost-include <include>./seqan-trunk/core/include <include>./hmmer/src <include>./hmmer/squid ] boost_serialization boost_system hmmer squid : ;
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include <include>./hmmer/src <include>./hmmer/squid ] boost_serialization boost_system hmmer squid : ;
 
 alias profileToHMMer : profileToHMMer_DNA ;
 
@@ -117,7 +117,6 @@ install dist : progs converters : <location>dist ;
 alias install : dist ;
 
 explicit profileToHMMer profileToHMMer_DNA install dist ;
-
 
 lib boost_serialization : : <file>./boost-lib/libboost_serialization.a ;
 lib boost_filesystem : : <file>./boost-lib/libboost_filesystem.a ;
