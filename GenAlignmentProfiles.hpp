@@ -92,8 +92,12 @@ public:
    * Alignment Profiles.
    **/
   std::vector<typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile>
-  gen_alignment_profiles ( boost::program_options::variables_map vm ) const
+  gen_alignment_profiles (
+    typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters & params
+  ) const
   {
+    boost::program_options::variables_map const & vm = params.m_galosh_options_map;
+    
     typedef ProfileTreeRoot<ResidueType, ProbabilityType> ProfileType;
 
     /**
@@ -110,9 +114,9 @@ public:
     if( vm.count( "verbosity" ) ) {
       verbosity = vm["verbosity"].as<int>();
     }
-    const bool be_verbose = verbosity > 0;
-    const bool be_verbose_show_profiles = verbosity > 1;
-    const bool be_verbose_show_sequences = verbosity > 2;
+    const bool be_verbose = verbosity > VERBOSITY_Meta;
+    const bool be_verbose_show_profiles = verbosity > VERBOSITY_Low;
+    const bool be_verbose_show_sequences = verbosity > VERBOSITY_High;
     const bool use_viterbi = vm.count( "viterbi" ) > 0;
     const bool indiv_profiles = vm.count( "individual" ) > 0;
 
@@ -214,7 +218,7 @@ public:
     // the summed / common alignment profile.
     // TODO: Use only one alignment profile, unless indiv_profiles is true.
     std::vector<typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile> alignment_profiles( sequence_count );
-    for ( int i = 0; i < alignment_profiles.size(); i++ )
+    for ( int i = 0; i < sequence_count; i++ )
     {
       alignment_profiles[ i ].reinitialize( profile.length() + 1 );
     }
@@ -222,10 +226,10 @@ public:
     //TAH 5/15 - to do -- This assumes that alignment profiles are in the same order as fasta sequence names.  Not sure that's true/
     if( be_verbose ) { //TAH copy fasta file names to alignment profiles 
        cerr << "Copying sequence names from fasta to alignment profiles" << endl;
-    } // be_verbose   
-    int j;
-    for(j=0; j<fasta.size(); j++) {
-       alignment_profiles[j].m_comment = fasta.m_descriptions[j];
+    } // be_verbose
+    
+    for( int j = 0; j < sequence_count ; j++ ) {
+       alignment_profiles[ j ].m_comment = fasta.m_descriptions[ j ];
     }
     
     if( be_verbose ) {
@@ -246,6 +250,9 @@ public:
 
     if( indiv_profiles ) {
 
+      if( be_verbose ) {
+        cerr << "Unscaling each of " << sequence_count << " alignment profiles" << endl;
+      }
       // Normalize them
       // Actually, don't normalize them.  But do unscale them.
       // \todo Make the normalization option into a command-line parameter
@@ -254,6 +261,9 @@ public:
       //  alignment_profiles[ i ].normalize( 0.0 );
         alignment_profiles[ i ].unscale();
       }
+      if( be_verbose ) { 
+        cerr << "\tdone." << endl;
+      }
       return alignment_profiles;
     }
 
@@ -261,9 +271,9 @@ public:
     combined_alignment_profile.reinitialize( profile.length() + 1 );
     combined_alignment_profile.zero();
     if( be_verbose ) {
-      cerr << "Combining " << alignment_profiles.size() << " profiles" << endl;
+      cerr << "Combining " << sequence_count << " profiles" << endl;
     }
-    for( int i = 0; i < alignment_profiles.size(); i++ )
+    for( int i = 0; i < sequence_count; i++ )
     {
       combined_alignment_profile += alignment_profiles[ i ];
     }

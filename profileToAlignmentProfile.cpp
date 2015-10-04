@@ -76,69 +76,168 @@ main ( int const argc, char ** argv )
   typedef seqan::Dna ResidueType;
   typedef seqan::Iupac SequenceResidueType;
 #endif // __PROFUSE_USE_AMINOS .. else ..
-  /**
-   * This section is for parsing commandline options.
-   * \var po::options_description desc
-   * \brief is for \a named options.
-   * \var po::positional_options_description pdesc
-   * \brief is for \a positional options
-   * \var po::variables_map vm
-   * \brief is a map that holds all the parsed commandline info
-   * \todo Add ability to read options from a file
-   */
-#define USAGE() " " << argv[0] << " [options] <profile-file-name> <fasta-file-name>"
-  namespace po = boost::program_options;
-  DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters dpp;
-  po::options_description dpod = dpp.m_galosh_options_description;
-  po::variables_map dpvm = dpp.m_galosh_options_map;
-  po::options_description desc("profileToAlignmentProfile options");
-  desc.add_options()
-      ("help,h", "output this help message")
-      ("individual,i","output individual alignment profiles instead of average")
-      ("nseq,n",po::value<int>(),"number of sequences to use (default is ALL)")
-      ("viterbi,v","use viterbi algorithm")
-      ("profile",po::value<string>(),"Name of file containing galosh profile")
-      ("fasta",po::value<string>(),"Name of fasta file containing sequences")
-  ;
-  desc.add(dpod);
-  po::positional_options_description pdesc;
-  pdesc.add("profile",1);
-  pdesc.add("fasta",1);
-  po::variables_map vm;
-  try
-  {
-    po::store(po::command_line_parser(argc,argv).options(desc).positional(pdesc).run(),vm);
-//    po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);
-    /// if --help or -h was specified, give help and normal exit
-    if( vm.count("help") )
-    {
+
+  try {
+    string config_file;
+    
+    // Declare a group of options that will be 
+    // allowed only on command line
+    po::options_description generic( "Generic options" );
+    generic.add_options()
+      ( "version,v", "print version string" )
+      ( "help,h", "produce help message" )
+      ( "config,c", po::value<string>( &config_file )->default_value( "profillic.cfg" ),
+        "name of a file of a configuration." )
+      ;
+
+    // Declare a group of options that will be 
+    // allowed both on command line and in
+    // config file
+    po::options_description config( "Configuration" );
+    config.add_options()
+      ( "profile,p", 
+        po::value<string>(),
+        "filename: where to find the input profile" )
+      ( "alignment_profiles,o", 
+        po::value<string>(),
+        "filename: where to put the output alignment profiles" )
+      ( "fasta,f", 
+        po::value<string>(),
+        "input sequences, in (unaligned) Fasta format" )
+      ("individual,i",
+       "output individual alignment profiles instead of average")
+      ("nseq,n",
+       po::value<int>(),
+       "number of sequences to use (default is ALL)")
+      ("viterbi,v", // todo: remove this.  it's just for debugging.
+       "use viterbi algorithm")
+      ;
+
+
+    // Hidden options, will be allowed both on command line and
+    // in config file, but will not be shown to the user.
+    // TODO: CHANGE THESE
+    //po::options_description lengthadjust_opts( "Lengthadjust options" );
+    //lengthadjust_opts.add_options()
+    //  ( "proposeInsertingOccupancyThreshold,dms.occupancy_threshold",
+    //    po::value<double>(),
+    //    "DMS threshold for fraction of sequences inserting/deleting to trigger a model edit of a given position" )
+    //  ;
+
+    typename DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::Parameters params;
+    
+    po::options_description cmdline_options;
+    cmdline_options.add( generic ).add( params.m_galosh_options_description ).add( config );//.add( lengthadjust_opts );
+
+    po::options_description config_file_options;
+    config_file_options.add( params.m_galosh_options_description ).add( config ); //.add( lengthadjust_opts );
+
+    po::options_description visible( "Basic options" );
+    visible.add( generic ).add( config );
+
+    po::positional_options_description p;
+    p.add( "profile", 1 );
+    p.add( "fasta", 1 );
+    p.add( "alignment_profiles", 1 );
+        
+    store( po::command_line_parser( argc, argv ).options( cmdline_options ).positional( p ).run(), params.m_galosh_options_map );
+    notify( params.m_galosh_options_map );
+
+    // TODO: REMOVE
+    //cout << params << endl;
+    //cout << endl;
+
+#define USAGE() " " << argv[ 0 ] << " [options] <profile file> <gapless fasta sequences file> [<output alignment profiles file>]"
+
+    // Read in the config file.
+    if( config_file.length() > 0 ) {
+      ifstream ifs( config_file.c_str() );
+      if( !ifs ) {
+        if(!params.m_galosh_options_map["config"].defaulted()) {         //TAH 3/13 don't choke if config file was defaulted and is missing
+           cout << "Can't open the config file named \"" << config_file << "\"\n";
+           return 0;
+        } 
+      } else {
+        store( parse_config_file( ifs, config_file_options ), params.m_galosh_options_map );
+        notify( params.m_galosh_options_map );
+      }
+    }
+
+    if( params.m_galosh_options_map.count( "help" ) > 0 ) {
       cout << "Usage: " << USAGE() << endl;
-      cout << desc << endl;
+      cout << visible << "\n";
       return 0;
     }
 
-    /// If either the profile file or the fasta file wasn't specified
-    /// give short usage message and error exit
-    if( !vm.count("profile") || !vm.count("fasta") )
-    {
-      cerr << "Usage: " << USAGE() << endl;
-      return( 1 );
+    if( params.m_galosh_options_map.count( "version" ) ) {
+      cout << "profileToAlignmentProfile, version 1.0\n";
+      return 0;
+    }
+
+    //if( params.m_galosh_options_map.count( "debug" ) ) {
+    //  cout << "[DEBUGGING]\n";
+    //  return 0;
+    //}
+
+    // Required options
+    if( ( params.m_galosh_options_map.count( "profile" ) == 0 ) || ( params.m_galosh_options_map.count( "fasta" ) == 0 ) ) {
+      cout << "Usage: " << USAGE() << endl;
+      return 1;
     }
     
+    //if( params.m_galosh_options_map.count( "include-path" ) ) {
+    //  cout << "Include paths are: " 
+    //       << params.m_galosh_options_map["include-path"].as< vector<string> >() << "\n";
+    //}
+    //
+    //    if (params.m_galosh_options_map.count("input-file"))
+    //    {
+    //        cout << "Input files are: " 
+    //             << params.m_galosh_options_map["input-file"].as< vector<string> >() << "\n";
+    //    }
+
     /// Do the work
-    GenAlignmentProfiles<ProbabilityType, ScoreType, MatrixValueType, ResidueType, SequenceResidueType> genAlignProf;
-    std::vector<DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile> alignment_profiles;
-    alignment_profiles = genAlignProf.gen_alignment_profiles( vm );
-    
-    /// Output the results
     /// \todo Make the profile scanner skip "#" lines
     /// \todo Label lines of individual profiles with something
-    for( int i = 0; i < alignment_profiles.size(); i++ )
-    {
-      if(alignment_profiles.size() > 1) std:cout << "#" << alignment_profiles[i].m_comment << std::endl;
-      std::cout << alignment_profiles[ i ];
-    }
+    GenAlignmentProfiles<ProbabilityType, ScoreType, MatrixValueType, ResidueType, SequenceResidueType> genAlignProf;
+    std::vector<DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile> alignment_profiles;
+    alignment_profiles = genAlignProf.gen_alignment_profiles( params );
+    
+    const std::string output_filename = ( params.m_galosh_options_map )[ "alignment_profiles" ].template as<string>();
+
+    string const * const output_filename_ptr = &output_filename;
+    
+    /// Output the results
+    if( ( output_filename_ptr == NULL ) ) { //|| ( output_filename.compare( "" ) == 0 ) || ( output_filename.compare( "-" ) == 0 ) ) {
+      for( int i = 0; i < alignment_profiles.size(); i++ )
+      {
+        if( alignment_profiles.size() > 1 ) {
+          std:cout << "#" << alignment_profiles[ i ].m_comment << std::endl;
+        }
+        std::cout << alignment_profiles[ i ];
+      }  
+    } else {
+      std::ofstream fs ( output_filename_ptr->c_str() );
+    
+      if( !fs.is_open() ) {
+        // TODO: ?
+        cerr << "The alignment profiles output file '" << *output_filename_ptr << "' could not be opened." << endl;
+      } else {
+        for( int i = 0; i < alignment_profiles.size(); i++ )
+        {
+          if( alignment_profiles.size() > 1 ) {
+            if( alignment_profiles[ i ].m_comment.compare( "" ) == 0 ) {
+              fs << "# <<" << i << ">>" << std::endl;
+            } else {
+              fs << "#" << alignment_profiles[ i ].m_comment << std::endl;
+            }
+          }
+          fs << alignment_profiles[ i ];
+        }  
+        fs.close();
+        cout << "Wrote the alignment profiles to file \"" << *output_filename_ptr << "\"." << endl;
+      }
+    } // End if profile_output_filename_ptr != NULL
     
     return 0; // success
   } catch( std::exception& e ) { /// exceptions thrown by boost stuff
@@ -151,5 +250,6 @@ main ( int const argc, char ** argv )
     cerr << "Strange unknown exception" << endl;
     return 1;
   }
+    
 } // main (..)
 
