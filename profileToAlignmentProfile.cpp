@@ -47,6 +47,8 @@
  */
 
 #include <boost/program_options.hpp>
+#include <boost/algorithm/string/replace.hpp>    
+#include <boost/lexical_cast.hpp>
 
 #include "GenAlignmentProfiles.hpp"
 
@@ -98,14 +100,17 @@ main ( int const argc, char ** argv )
       ( "profile,p", 
         po::value<string>(),
         "filename: where to find the input profile" )
-      ( "alignment_profiles,o", 
-        po::value<string>(),
-        "filename: where to put the output alignment profiles" )
+      ( "alignment_profiles_prefix,o", 
+        po::value<string>()->default_value( "profillic_profileToAlignmentProfile" ),
+        "filename prefix: where to put the output alignment profiles" )
       ( "fasta,f", 
         po::value<string>(),
         "input sequences, in (unaligned) Fasta format" )
       ("individual,i",
        "output individual alignment profiles instead of average")
+      ("individual-filename-suffix-pattern,s",
+       po::value<string>()->default_value(  "_$n.aprof" ),
+       "pattern for filenames by which to differentiate output individual alignment profiles, in which $n will be replaced by the sequence name and $d with be replaced by the sequence number (default: '_$n.aprof'")
       ("nseq,n",
        po::value<int>(),
        "number of sequences to use (default is ALL)")
@@ -138,7 +143,7 @@ main ( int const argc, char ** argv )
     po::positional_options_description p;
     p.add( "profile", 1 );
     p.add( "fasta", 1 );
-    p.add( "alignment_profiles", 1 );
+    p.add( "alignment_profiles_prefix", 1 );
         
     store( po::command_line_parser( argc, argv ).options( cmdline_options ).positional( p ).run(), params.m_galosh_options_map );
     notify( params.m_galosh_options_map );
@@ -147,7 +152,7 @@ main ( int const argc, char ** argv )
     //cout << params << endl;
     //cout << endl;
 
-#define USAGE() " " << argv[ 0 ] << " [options] <profile file> <gapless fasta sequences file> [<output alignment profiles file>]"
+#define USAGE() " " << argv[ 0 ] << " [options] <profile file> <gapless fasta sequences file> [<output alignment profiles file prefix>]"
 
     // Read in the config file.
     if( config_file.length() > 0 ) {
@@ -197,16 +202,18 @@ main ( int const argc, char ** argv )
     //    }
 
     /// Do the work
-    /// \todo Make the profile scanner skip "#" lines
-    /// \todo Label lines of individual profiles with something
+    const bool indiv_profiles = ( params.m_galosh_options_map ).count( "individual" ) > 0;
+    
     GenAlignmentProfiles<ProbabilityType, ScoreType, MatrixValueType, ResidueType, SequenceResidueType> genAlignProf;
     std::vector<DynamicProgramming<ResidueType, ProbabilityType, ScoreType, MatrixValueType>::AlignmentProfile> alignment_profiles;
     alignment_profiles = genAlignProf.gen_alignment_profiles( params );
-    
-    const std::string output_filename = ( params.m_galosh_options_map )[ "alignment_profiles" ].template as<string>();
 
-    string const * const output_filename_ptr = &output_filename;
-    
+    const std::string output_filename_prefix = ( params.m_galosh_options_map )[ "alignment_profiles_prefix" ].template as<string>();
+    const std::string individual_filename_suffix_pattern = ( params.m_galosh_options_map )[ "individual-filename-suffix-pattern" ].template as<string>();
+
+    std::string individual_output_filename = output_filename_prefix + individual_filename_suffix_pattern;
+    string const * output_filename_ptr = &individual_output_filename;
+
     /// Output the results
     if( ( output_filename_ptr == NULL ) ) { //|| ( output_filename.compare( "" ) == 0 ) || ( output_filename.compare( "-" ) == 0 ) ) {
       for( int i = 0; i < alignment_profiles.size(); i++ )
@@ -217,26 +224,29 @@ main ( int const argc, char ** argv )
         std::cout << alignment_profiles[ i ];
       }  
     } else {
+      for( int i = 0; i < alignment_profiles.size(); i++ )
+      {
+        if( indiv_profiles ) {
+          individual_output_filename = output_filename_prefix + individual_filename_suffix_pattern;
+          if( alignment_profiles[ i ].m_comment.length() > 0 ) {
+            boost::replace_all( individual_output_filename, "$n", alignment_profiles[ i ].m_comment );
+          } else {
+            boost::replace_all( individual_output_filename, "$n", boost::lexical_cast<std::string>( i ) );
+          }
+          boost::replace_all( individual_output_filename, "$d", boost::lexical_cast<std::string>( i ) );
+          output_filename_ptr = &individual_output_filename;
+        }
       std::ofstream fs ( output_filename_ptr->c_str() );
-    
       if( !fs.is_open() ) {
         // TODO: ?
         cerr << "The alignment profiles output file '" << *output_filename_ptr << "' could not be opened." << endl;
       } else {
-        for( int i = 0; i < alignment_profiles.size(); i++ )
-        {
-          if( alignment_profiles.size() > 1 ) {
-            if( alignment_profiles[ i ].m_comment.compare( "" ) == 0 ) {
-              fs << "# <<" << i << ">>" << std::endl;
-            } else {
-              fs << "#" << alignment_profiles[ i ].m_comment << std::endl;
-            }
-          }
           fs << alignment_profiles[ i ];
+          fs.close();
+          // We print out the output files as a side effect
+          cout << *output_filename_ptr << endl;
         }  
-        fs.close();
-        cout << "Wrote the alignment profiles to file \"" << *output_filename_ptr << "\"." << endl;
-      }
+      } // End foreach alignment_profile i
     } // End if profile_output_filename_ptr != NULL
     
     return 0; // success

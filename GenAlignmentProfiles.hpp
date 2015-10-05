@@ -105,8 +105,9 @@ public:
      */
     const std::string profile_filename = vm["profile"].as<string>();
     const std::string fasta_filename = vm["fasta"].as<string>();
-
-    int sequence_count = 0;
+    const std::string individual_filename_suffix_pattern = vm["individual-filename-suffix-pattern"].as<string>();
+    
+  int sequence_count = 0;
     if( vm.count( "nseq" ) ) {
       sequence_count = vm["nseq"].as<int>();
     }
@@ -233,7 +234,7 @@ public:
     }
     
     if( be_verbose ) {
-      cerr << "calculating alignment profiles with " << sequence_count << " sequences" << endl;
+      cerr << "\tdone.\nCalculating alignment profiles with " << sequence_count << " sequences." << endl;
     }
 
     dp.calculateAlignmentProfiles(
@@ -251,7 +252,7 @@ public:
     if( indiv_profiles ) {
 
       if( be_verbose ) {
-        cerr << "Unscaling each of " << sequence_count << " alignment profiles" << endl;
+        cerr << "Unscaling each of " << sequence_count << " alignment profiles." << endl;
       }
       // Normalize them
       // Actually, don't normalize them.  But do unscale them.
@@ -271,7 +272,7 @@ public:
     combined_alignment_profile.reinitialize( profile.length() + 1 );
     combined_alignment_profile.zero();
     if( be_verbose ) {
-      cerr << "Combining " << sequence_count << " profiles" << endl;
+      cerr << "Combining " << sequence_count << " alignment profiles." << endl;
     }
     for( int i = 0; i < sequence_count; i++ )
     {
