@@ -59,7 +59,9 @@ rehash
 
 git clone https://github.com/pedlefsen/HMMoC-BFloat-Algebra.git
 cd HMMoC-BFloat-Algebra
-bjam dist release
+ln -s /opt/local/include boost-include
+ln -s /opt/local/lib boost-lib
+bjam dist release --toolset=darwin
 cd ..
 
 git clone https://github.com/galosh/prolific.git
@@ -72,18 +74,18 @@ FINALLY, installing profuse.
 
 ## NOTE: I had to add --toolset=darwin because it wasn't guessing it correctly. You can add eg "use darwin ;" to your site-config.jam [or user-config.jam] file.
     
-ln -s /usr/local/lib boost-lib
-ln -s /usr/local/include boost-include
+ln -s /opt/local/lib boost-lib
+ln -s /opt/local/include boost-include
 ln -s ~/src/from-git/seqan seqan-trunk
 ln -s ../HMMoC-BFloat-Algebra
 ln -s ../prolific
 
 # First must make sure you can compile it in the fast-to-compile, slow-to-run "debug" variant, before trying to compile the slow-to-compile "release" variant.
-bjam --clean
-bjam debug align_AA
+bjam --clean --toolset=darwin
+bjam debug align_AA --toolset=darwin
 
 # If that works (fingers crossed!), do
-bjam install release
+bjam install release --toolset=darwin
 # The above will (slowly) compile the executables, and will copy them to the dist/ subdir.
 
 # You might be interested to check out the bjam (Boost.Build) documentation: http://www.boost.org/boost-build2/doc/html/index.html
