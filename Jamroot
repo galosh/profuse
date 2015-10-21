@@ -55,7 +55,19 @@ exe createRandomSequence_DNA
 alias createRandomSequence : createRandomSequence_DNA ;
 
 
-alias progs : align score drawSequences createRandomSequence ;
+
+exe profileCrossEntropy_AA
+    : [ obj ProfileCrossEntropy_obj : ProfileCrossEntropy.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include <define>__PROFUSE_USE_AMINOS ] boost_serialization : ;
+
+exe profileCrossEntropy_DNA
+    : [ obj ProfileCrossEntropy_obj : ProfileCrossEntropy.cpp
+        : <include>./prolific <include>./boost-include <include>./seqan-trunk/include ] boost_serialization : ;
+
+alias profileCrossEntropy : profileCrossEntropy_AA profileCrossEntropy_DNA ;
+
+
+alias progs : align score drawSequences createRandomSequence profileCrossEntropy ;
 
 
 exe sequenceToProfile_AA
