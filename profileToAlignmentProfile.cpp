@@ -88,7 +88,7 @@ main ( int const argc, char ** argv )
     generic.add_options()
       ( "version,v", "print version string" )
       ( "help,h", "produce help message" )
-      ( "config,c", po::value<string>( &config_file )->default_value( "profillic.cfg" ),
+      ( "config,c", po::value<string>( &config_file )->default_value( "profuse.cfg" ),
         "name of a file of a configuration." )
       ;
 
