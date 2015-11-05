@@ -49,6 +49,7 @@
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/replace.hpp>    
 #include <boost/lexical_cast.hpp>
+#include <boost/filesystem.hpp>
 
 #include "GenAlignmentProfiles.hpp"
 
@@ -58,6 +59,9 @@ char **g_argv;
 #endif // __HAVE_MUSCLE
 
 using namespace galosh;
+
+// forward decls
+string escape_path ( const string & unescaped_path );
 
 /**
  * \fn int main(int const argc, char ** argv)
@@ -110,7 +114,7 @@ main ( int const argc, char ** argv )
        "output individual alignment profiles instead of average")
       ("individual-filename-suffix-pattern,s",
        po::value<string>()->default_value(  "_$n.aprof" ),
-       "pattern for filenames by which to differentiate output individual alignment profiles, in which $n will be replaced by the sequence name and $d with be replaced by the sequence number (default: '_$n.aprof'")
+       "pattern for filenames by which to differentiate output individual alignment profiles, in which $n will be replaced by the sequence name (possibly modified to be a valid filename) and $d with be replaced by the sequence number (default: '_$n.aprof'")
       ("nseq,n",
        po::value<int>(),
        "number of sequences to use (default is ALL)")
@@ -229,7 +233,7 @@ main ( int const argc, char ** argv )
         if( indiv_profiles ) {
           individual_output_filename = output_filename_prefix + individual_filename_suffix_pattern;
           if( alignment_profiles[ i ].m_comment.length() > 0 ) {
-            boost::replace_all( individual_output_filename, "$n", alignment_profiles[ i ].m_comment );
+            boost::replace_all( individual_output_filename, "$n", escape_path( alignment_profiles[ i ].m_comment ) );
           } else {
             boost::replace_all( individual_output_filename, "$n", boost::lexical_cast<std::string>( i ) );
           }
@@ -263,3 +267,8 @@ main ( int const argc, char ** argv )
     
 } // main (..)
 
+string escape_path ( const string & unescaped_path )
+{
+  boost::filesystem::path escaped_path( unescaped_path );
+  return( escaped_path.native() );
+} // escape_path ( const string & )
