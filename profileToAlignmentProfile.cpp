@@ -215,7 +215,10 @@ main ( int const argc, char ** argv )
     const std::string output_filename_prefix = ( params.m_galosh_options_map )[ "alignment_profiles_prefix" ].template as<string>();
     const std::string individual_filename_suffix_pattern = ( params.m_galosh_options_map )[ "individual-filename-suffix-pattern" ].template as<string>();
 
-    std::string individual_output_filename = output_filename_prefix + individual_filename_suffix_pattern;
+    std::string individual_output_filename = output_filename_prefix;
+    if( indiv_profiles ) {
+      individual_output_filename += individual_filename_suffix_pattern;
+    } 
     string const * output_filename_ptr = &individual_output_filename;
 
     /// Output the results
@@ -269,6 +272,14 @@ main ( int const argc, char ** argv )
 
 string escape_path ( const string & unescaped_path )
 {
-  boost::filesystem::path escaped_path( unescaped_path );
+  std::string escaped_path_str( unescaped_path );
+  boost::replace_all( escaped_path_str, "|", "-x-BAR-x-" );
+  boost::replace_all( escaped_path_str, "/", "-x-SLASH-x-" );
+  boost::replace_all( escaped_path_str, "\\", "-x-BACKSLASH-x-" );
+  boost::replace_all( escaped_path_str, "..", "-x-DOTDOT-x-" );
+  boost::replace_all( escaped_path_str, ".", "-x-DOT-x-" );
+  boost::filesystem::path escaped_path( escaped_path_str );
+  // TODO: REMOVE
+  //cout << "escape_path( " << unescaped_path << " ): " << escaped_path.native() << endl;
   return( escaped_path.native() );
 } // escape_path ( const string & )
